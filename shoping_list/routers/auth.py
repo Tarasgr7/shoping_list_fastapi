@@ -46,6 +46,10 @@ db_dependency=Annotated[Session,Depends(get_db)]
 
 @router.post('/', status_code=status.HTTP_201_CREATED )
 async def create_user(db: db_dependency, create_user_request:CreateUserRequest):
+  if validate_password(create_user_request.password) == False :
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid password ")
+  if validate_email(create_user_request.email) == False:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid  email")
   create_user_model= Users(
     username=create_user_request.username,
     password_hash=bcrypt_context.hash(create_user_request.password),
