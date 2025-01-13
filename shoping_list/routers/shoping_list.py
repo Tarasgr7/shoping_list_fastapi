@@ -1,9 +1,9 @@
 from fastapi import Depends,APIRouter,status,HTTPException, Path
 from pydantic import BaseModel
-from ..database import SessionLocal
+from database import SessionLocal
 from sqlalchemy.orm import Session
-from ..models import ShoppingLists,Items
-from .auth import get_current_user
+from models import ShoppingLists,Items
+from utils.auth_utils import get_current_user
 from typing import Annotated
 from sqlalchemy import func
 router=APIRouter(
@@ -87,11 +87,11 @@ class ItemCreate(BaseModel):
   quantity: int
 
 
-@router.get('/{list_name}/items',status_code=status.HTTP_200_OK)
+@router.get('/{list_id}/items',status_code=status.HTTP_200_OK)
 async def get_items_for_list(user:user_dependency, db:db_dependency,list_name: str):
   if user is None:
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-  shopping_list = db.query(ShoppingLists).filter(func.lower(ShoppingLists.name)==list_name.lower(),
+  shopping_list = db.query(ShoppingLists).filter(ShoppingLists.name==list_name,
                                                  ShoppingLists.user_id==user.get('user_id')).first()
   if shopping_list is None:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shopping list not found")

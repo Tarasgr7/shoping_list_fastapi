@@ -1,0 +1,12 @@
+/.venv/
+/.pytest_cache/
+
+/shoping_list/.pytest_cache/
+/shoping_list/test/__pycache__/
+/shoping_list/utils/__pycache__/
+# Виключення баз даних
+*.sqlite
+*.db
+
+# Виключення хешів
+*.hash

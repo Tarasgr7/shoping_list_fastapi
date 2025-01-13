@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  shopping-list-app:
+    build: .
+    container_name: shopping_list
+    ports:
+      - "8000:8080"
+
