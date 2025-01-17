@@ -104,7 +104,6 @@ async def login_for_access_token(
 ):
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
-        print("Помилка 1")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password"
@@ -188,17 +187,14 @@ async def github_callback(code: str, request: Request, db: db_dependency):
     headers={'Accept': 'application/json'}
     async with httpx.AsyncClient() as client:
         response = await client.post(token_url, data=data,headers=headers)
-        print(response)
         response.raise_for_status()
         token_response = response.json()
-        print(token_response)
     access_token = token_response.get('access_token')
     if not access_token:
         raise HTTPException(status_code=400, detail="Missing access token in response.")
     async with httpx.AsyncClient() as client:
       headers.update({"Authorization": f"Bearer {access_token}"})
       response=await client.get("https://api.github.com/user",headers=headers)
-      print(response.json())
     return response.json()
 
 
