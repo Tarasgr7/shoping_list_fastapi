@@ -24,7 +24,8 @@ load_dotenv()
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-
+GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
 
 
 router= APIRouter(
@@ -115,7 +116,7 @@ async def login_for_access_token(
 
 
 
-@router.get("/auth")
+@router.get("/google")
 async def login(request: Request):
     redirect_uri = request.url_for('auth_callback')
     google_auth_url = f"https://accounts.google.com/o/oauth2/auth?client_id={GOOGLE_CLIENT_ID}&redirect_uri={redirect_uri}&response_type=code&scope=openid email profile"
@@ -171,6 +172,34 @@ async def auth_callback(code: str, request: Request,db: db_dependency):
         raise HTTPException(status_code=500, detail="Internal Server Error")
     
 
+@router.get("/github")
+async def github_login(request: Request):
+  return RedirectResponse(f'https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}',status_code=status.HTTP_302_FOUND)
+
+
+@router.get("/callback/github")
+async def github_callback(code: str, request: Request, db: db_dependency):
+    token_url = "https://github.com/login/oauth/access_token"
+    data = {
+        'client_id': GITHUB_CLIENT_ID,
+        'client_secret': GITHUB_CLIENT_SECRET,
+        'code': code,
+    }
+    headers={'Accept': 'application/json'}
+    async with httpx.AsyncClient() as client:
+        response = await client.post(token_url, data=data,headers=headers)
+        print(response)
+        response.raise_for_status()
+        token_response = response.json()
+        print(token_response)
+    access_token = token_response.get('access_token')
+    if not access_token:
+        raise HTTPException(status_code=400, detail="Missing access token in response.")
+    async with httpx.AsyncClient() as client:
+      headers.update({"Authorization": f"Bearer {access_token}"})
+      response=await client.get("https://api.github.com/user",headers=headers)
+      print(response.json())
+    return response.json()
 
 
 @router.get("/welcome")
