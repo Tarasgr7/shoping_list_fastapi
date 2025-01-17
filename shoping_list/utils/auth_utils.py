@@ -10,6 +10,9 @@ from datetime import timedelta, datetime, timezone
 from jose import JWTError, jwt
 import re
 
+
+
+
 SECRET_KEY="126474140cdf5d05dab0a5cd0809d207d48095d8e459ff7515ec722b281cba8e"
 
 ALGORITHM='HS256'
@@ -30,6 +33,8 @@ def authenticate_user(username:str,password:str, db):
   user= db.query(Users).filter(Users.username==username).first()
   if not user:
     return False
+  if user.password_hash is None:
+        return user 
   if not bcrypt_context.verify(password, user.password_hash):
     return False
   return user
