@@ -1,5 +1,5 @@
 /.venv/
-/.pytest_cache/
+.pytest_cache/
 
 /shoping_list/.pytest_cache/
 /shoping_list/test/__pycache__/
@@ -7,8 +7,13 @@
 # Виключення баз даних
 *.sqlite
 *.db
-*.pyc
+
 # Виключення хешів
 *.hash
 
+
+
 *.env
+
+*.pyc
+__pycache__/

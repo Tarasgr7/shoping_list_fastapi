@@ -16,7 +16,6 @@ from fastapi.responses import RedirectResponse
 from google.oauth2 import id_token
 from google.auth.transport import requests
 import httpx
-
 from fastapi.templating import Jinja2Templates
 
 
